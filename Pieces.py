@@ -1,5 +1,6 @@
 import abc
 
+
 class piece(abc.ABC) :
     def __init__(self, Lettre_coor, Nombre_coor, Couleur, Symboles) :
         #Couleur est codé : 0 pour blanc et 1 pour noir
@@ -13,6 +14,10 @@ class piece(abc.ABC) :
     @abc.abstractmethod
     def mouvement(self):
         pass
+    
+
+    def nouvelle_position(self, Lettre_destination, Nombre_destination):
+        self.__coordonnee = {"lettre" : Lettre_destination, "nombre" : Nombre_destination}
 
     def moi(self, Lettre_destination, Nombre_destination) :
         #permet aux methodes mouvement de savoir qu'on demande un coup qui ne fait pas bouger la pièce
@@ -149,4 +154,4 @@ class roi(piece):
         return "impossible"
 
 #def Tour() :
-#    d 
+     
