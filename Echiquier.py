@@ -1,4 +1,5 @@
 import abc
+from Pieces import *
 #jeu d'echec à rendre pour le 21/01
 class Table :
     def __init__(self) :
@@ -32,15 +33,37 @@ class Table :
         self.liste_piece.append(roi('e',1,0))
         #on va les placer
         self.mise_a_jour()
+        #self.__repr__()
+        
 
     def mise_a_jour(self):
         #on réécrit la representation de la table à chaque mise à jour
         self.feuille = []
-        for i in range(8):
+        for i in range(0 ,8):
             self.feuille.append([])
-            for j in range(8):
-                self.feuille[i].append('|_|')
+            for j in range(0 ,8):
+                self.feuille[i].append(' ')
         for la_piece in self.liste_piece :
             emplacement_codee = la_piece.get_coordonnee() 
             emplacement_decodee = [emplacement_codee["nombre"] -1 , self.__lettre_vers_emplacement[emplacement_codee["lettre"]]]
-            self.feuille[emplacement_decodee[0]][emplacement_decodee[1]] = la_piece.get_symbole
+            self.feuille[emplacement_decodee[0]][emplacement_decodee[1]] = la_piece.get_symbole()
+
+    def __repr__(self) :
+      
+        print("  a | b | c | d | e | f | g | h |")
+        for i in range(0 ,8):
+            print("-"*32)
+            
+            print(int(8-i),end="|")
+            for j in range(0 ,8):
+                item = self.feuille[i][j] 
+                print(str(item)+' |', end = " ")
+            print()
+        print("-"*32)
+        return ''
+
+
+        
+
+test = Table()
+print(test)
