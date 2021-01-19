@@ -74,24 +74,30 @@ class Table :
                 Coup = Lire()
                 Liste_indice = self.select(Coup)
             print(self.liste_piece[Liste_indice[0]].get_coordonnee())
-            
-            if len(Liste_indice) > 1 :
-                print("Ce coup peut être fait avec plusieurs pieces")
-                #Liste_indice = lire choix de la pièce
-            
-            Colision = self.colision(Liste_indice[0], Coup)
-            if Colision[0] :
-                if Colision[1] :
-                    print("Ce coup est impossible, une pièce alliése trouve sur la route")
-                    continue
+
+            Liste_indice_valide = []
+            for indice in Liste_indice:
+                Colision = self.colision(indice, Coup)
+                if Colision[0] :
+                    if not Colision[1] :
+                        Liste_indice_valide.append([indice, Colision[2], Colision[3]])
                 else :
-                    self.liste_piece[Colision[2]].pris()
-                    self.liste_piece[Liste_indice[0]].nouvelle_position(Colision[3][0],Colision[3][1])
-            else:
-                self.liste_piece[Liste_indice[0]].nouvelle_position(Coup[1],int(Coup[2]))
+                    Liste_indice_valide.append([indice])
+
+            if len(Liste_indice_valide) == 0 :
+                print("Ce coup est impossible, aucune pièce ne peut le réaliser")
+                continue
+            elif len(Liste_indice_valide) > 1 :
+                print("Ce coup peut être fait avec plusieurs pieces")
+                #Liste_indice_valide = lire choix de la pièce
+
+            if len(Liste_indice_valide[0]) > 1 :
+                self.liste_piece[Liste_indice_valide[0][1]].pris()
+                self.liste_piece[Liste_indice_valide[0][0]].nouvelle_position(Liste_indice_valide[0][2][0], int(Liste_indice_valide[0][2][1]))
+            else  :
+                self.liste_piece[Liste_indice_valide[0][0]].nouvelle_position(Coup[1],int(Coup[2]))
             break
-
-
+            
 
     def mise_a_jour(self):
         #on réécrit la representation de la table à chaque mise à jour
