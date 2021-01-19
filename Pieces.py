@@ -21,6 +21,9 @@ class piece(abc.ABC) :
     def chemin(self):
         pass
 
+    def pris(self):
+        self.vie = False
+
     def conversion_lettre(self, lettre):
         return self.lettre_vers_emplacement[lettre]
 
@@ -41,13 +44,21 @@ class piece(abc.ABC) :
 
     def get_symbole(self):
         return self.symbole
+    
+    def get_couleur(self):
+        return self.Couleur
 
 class pion(piece):
     def __init__(self, Lettre_coor, Nombre_coor, Couleur) :
         piece.__init__(self, Lettre_coor, Nombre_coor, Couleur, "Pp")
+        self.position_initial = True
+
+    def nouvelle_position(self, Lettre_destination, Nombre_destination):
+        self.coordonnee = {"lettre" : Lettre_destination, "nombre" : Nombre_destination}
+        self.position_initial = False
 
     def mouvement(self, Lettre_destination, Nombre_destination):
-        if self.moi(Lettre_destination, Nombre_destination):
+        if self.moi(Lettre_destination, Nombre_destination) or not self.vie:
             return "impossible"
         #la portée servira quand on ajoutera le premier mouvement du pion
         portee = 1
@@ -58,6 +69,12 @@ class pion(piece):
                 return "avance"
             if self.Couleur == 1 and Nombre_destination == (self.coordonnee['nombre'] - portee) :
                 return "avance"
+            if self.position_initial :
+                portee = 2
+                if self.Couleur == 0 and Nombre_destination == (self.coordonnee["nombre"] + portee) :
+                    return "avance"
+                if self.Couleur == 1 and Nombre_destination == (self.coordonnee['nombre'] - portee) :
+                    return "avance"
         emplacement_decodee = self.conversion_lettre(self.coordonnee["lettre"])
         destination_decodee = self.conversion_lettre(Lettre_destination)
         #deplacement vers une colone adjacente ?
@@ -71,7 +88,12 @@ class pion(piece):
         
     def chemin(self, Lettre_destination, Nombre_destination):
         if Lettre_destination == self.coordonnee['lettre'] :
-            return [[self.coordonnee['lettre'], Nombre_destination]]
+            differance = Nombre_destination - self.coordonnee['nombre']
+            if differance == 1 or differance == -1:
+                return [[self.coordonnee['lettre'], Nombre_destination]]
+            else :
+                differance = differance/2
+                return [[Lettre_destination, self.coordonnee['nombre'] + differance],[Lettre_destination, Nombre_destination]]
         return [[Lettre_destination, Nombre_destination]]
 
 
@@ -80,7 +102,7 @@ class tour(piece):
         piece.__init__(self, Lettre_coor, Nombre_coor, Couleur, "Tt")
 
     def mouvement(self, Lettre_destination, Nombre_destination):
-        if self.moi(Lettre_destination, Nombre_destination):
+        if self.moi(Lettre_destination, Nombre_destination) or not self.vie:
             return "impossible"
         #déplacment sur la même colone ou la même ligne ?
         if Lettre_destination == self.coordonnee["lettre"] or Nombre_destination == self.coordonnee["nombre"]:
@@ -114,8 +136,8 @@ class fou(piece) :
     def __init__(self, Lettre_coor, Nombre_coor, Couleur) :
         piece.__init__(self, Lettre_coor, Nombre_coor, Couleur, "Ff")
 
-    def mouvement(self, Lettre_destination, Nombre_destination):
-        if self.moi(Lettre_destination, Nombre_destination):
+    def mouvement(self, Lettre_destination, Nombre_destination) :
+        if self.moi(Lettre_destination, Nombre_destination) or not self.vie:
             return "impossible"
         #tranforme les lettres en chiffre
         emplacement_decodee = self.conversion_lettre(self.coordonnee["lettre"])
@@ -160,7 +182,7 @@ class chevalier(piece):
         piece.__init__(self, Lettre_coor, Nombre_coor, Couleur, "Cc")
 
     def mouvement(self, Lettre_destination, Nombre_destination):
-        if self.moi(Lettre_destination, Nombre_destination):
+        if self.moi(Lettre_destination, Nombre_destination) or not self.vie:
             return "impossible"
         #tranforme les lettres en chiffre
         emplacement_decodee = self.conversion_lettre(self.coordonnee["lettre"])
@@ -185,7 +207,7 @@ class dame(piece):
         piece.__init__(self, Lettre_coor, Nombre_coor, Couleur, "Dd")
 
     def mouvement(self, Lettre_destination, Nombre_destination):
-        if self.moi(Lettre_destination, Nombre_destination):
+        if self.moi(Lettre_destination, Nombre_destination) or not self.vie:
             return "impossible"
         #addition du déplacement de la tour et du fou
         if Lettre_destination == self.coordonnee["lettre"] or Nombre_destination == self.coordonnee["nombre"]:
@@ -251,7 +273,7 @@ class roi(piece):
         piece.__init__(self, Lettre_coor, Nombre_coor, Couleur, "Rr")
 
     def mouvement(self, Lettre_destination, Nombre_destination):
-        if self.moi(Lettre_destination, Nombre_destination):
+        if self.moi(Lettre_destination, Nombre_destination) or not self.vie:
             return "impossible"
         #tranforme les lettres en chiffre
         emplacement_decodee = self.conversion_lettre(self.coordonnee["lettre"])

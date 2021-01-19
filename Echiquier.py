@@ -5,11 +5,11 @@ class Table :
     def __init__(self) :
         self.__lettre_vers_emplacement = {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f' : 5, 'g' : 6, 'h' : 7}
         self.feuille = []
-        self.liste_piece =[]
+        self.liste_piece = []
         #les pions
-        for l in "abcdefgh":
-            self.liste_piece.append(pion(l,7,1))
-            self.liste_piece.append(pion(l,2,0))
+        for le in "abcdefgh":
+            self.liste_piece.append(pion(le,7,1))
+            self.liste_piece.append(pion(le,2,0))
         #les tours
         self.liste_piece.append(tour('a',8,1))
         self.liste_piece.append(tour('h',8,1))
@@ -33,8 +33,65 @@ class Table :
         self.liste_piece.append(roi('e',1,0))
         #on va les placer
         self.mise_a_jour()
-        #self.__repr__()
+
+    def test_des_deplacement(self):
+        print(self)
+        while True :
+            print("Continuer ?")
+            n = input()
+            if n == '1':
+                break
+            self.deplacement()
+            self.mise_a_jour()
+            print(self)
+
+
+#Gaëtan a rajouté/modifié :
+
+    def colision(self, indice, coup) :
+        #renvois : colision ? même camp ? coordonnée si adversaire
+        Chemin = self.liste_piece[indice].chemin(coup[1],int(coup[2]))
+        for indice_case in range(len(Chemin)) :
+            for indice_piece in range(32):
+                if indice_piece == indice :
+                    continue
+                if self.liste_piece[indice_piece].vie and self.liste_piece[indice_piece].moi(Chemin[indice_case][0], Chemin[indice_case][1]) :
+                    if self.liste_piece[indice_piece].get_couleur() == self.liste_piece[indice].get_couleur():
+                        #colision avec pièce de même faction
+                        return [True, True]
+                    else:
+                        #colision avec pièce adverse à la case donnée
+                        return [True, False, indice_piece, Chemin[indice_case]]
+        #aucune colision
+        return [False]
+      
+    def deplacement(self):
         
+        while True :
+            Liste_indice = []
+            while Liste_indice == [] :
+                print("Veuillez noter votre prochain coup")
+                Coup = Lire()
+                Liste_indice = self.select(Coup)
+            print(self.liste_piece[Liste_indice[0]].get_coordonnee())
+            
+            if len(Liste_indice) > 1 :
+                print("Ce coup peut être fait avec plusieurs pieces")
+                #Liste_indice = lire choix de la pièce
+            
+            Colision = self.colision(Liste_indice[0], Coup)
+            if Colision[0] :
+                if Colision[1] :
+                    print("Ce coup est impossible, une pièce alliése trouve sur la route")
+                    continue
+                else :
+                    self.liste_piece[Colision[2]].pris()
+                    self.liste_piece[Liste_indice[0]].nouvelle_position(Colision[3][0],Colision[3][1])
+            else:
+                self.liste_piece[Liste_indice[0]].nouvelle_position(Coup[1],int(Coup[2]))
+            break
+
+
 
     def mise_a_jour(self):
         #on réécrit la representation de la table à chaque mise à jour
@@ -44,18 +101,98 @@ class Table :
             for j in range(0 ,8):
                 self.feuille[i].append(' ')
         for la_piece in self.liste_piece :
-            emplacement_codee = la_piece.get_coordonnee() 
-            emplacement_decodee = [emplacement_codee["nombre"] -1 , self.__lettre_vers_emplacement[emplacement_codee["lettre"]]]
-            self.feuille[emplacement_decodee[0]][emplacement_decodee[1]] = la_piece.get_symbole()
+            if la_piece.vie :
+                emplacement_codee = la_piece.get_coordonnee() 
+                emplacement_decodee = [emplacement_codee["nombre"] -1 , self.__lettre_vers_emplacement[emplacement_codee["lettre"]]]
+                self.feuille[emplacement_decodee[0]][emplacement_decodee[1]] = la_piece.get_symbole()
 
+    def select(self, coup) : 
+
+        avancer=[]
+        if coup[0]== 'P' :
+            for nombre in [1,3,5,7,9,11,13,15] :
+                retourner=self.liste_piece[nombre].mouvement(coup[1], int(coup[2]))
+                if retourner== 'avance' : 
+                    avancer.append(nombre)
+
+        elif coup[0]== 'p' :
+            for nombre in [0 ,2 ,4,6,8,10,12,14] :
+                retourner=self.liste_piece[nombre].mouvement(coup[1], int(coup[2]))
+                if retourner== 'avance' : 
+                    avancer.append(nombre)
+
+        elif coup[0]== 'T' :
+            for nombre in [18,19] :
+                retourner=self.liste_piece[nombre].mouvement(coup[1], int(coup[2]))
+                if retourner== 'avance' : 
+                    avancer.append(nombre)
+
+        elif coup[0]== 't' : 
+            for nombre in [16,17] :
+                retourner=self.liste_piece[nombre].mouvement(coup[1], int(coup[2]))
+                if retourner== 'avance' : 
+                    avancer.append(nombre)
+
+        elif coup[0]== 'F' :
+            for nombre in [22,23] :
+                retourner=self.liste_piece[nombre].mouvement(coup[1], int(coup[2]))
+                if retourner== 'avance' : 
+                    avancer.append(nombre)
+
+        elif coup[0]== 'f' :
+            for nombre in [20,21] :
+                retourner=self.liste_piece[nombre].mouvement(coup[1], int(coup[2]))
+                if retourner== 'avance' : 
+                    avancer.append(nombre)
+
+        elif coup[0]== 'C' : 
+            for nombre in [26,27] : 
+                retourner=self.liste_piece[nombre].mouvement(coup[1], int(coup[2]))
+                if retourner== 'avance' : 
+                    avancer.append(nombre)
+
+        elif coup[0]== 'c'  : 
+            for nombre in [25,24] : 
+                retourner=self.liste_piece[nombre].mouvement(coup[1], int(coup[2]))
+                if retourner== 'avance' : 
+                    avancer.append(nombre)
+
+        elif coup[0]== 'D' : 
+            for nombre in [29] :
+                retourner=self.liste_piece[nombre].mouvement(coup[1], int(coup[2]))
+                if retourner== 'avance' : 
+                    avancer.append(nombre)
+
+        elif coup[0]== 'd' : 
+            for nombre in [28] : 
+                retourner=self.liste_piece[nombre].mouvement(coup[1], int(coup[2]))
+                if retourner== 'avance' : 
+                    avancer.append(nombre)
+
+
+        elif coup[0]== 'R' : 
+            for nombre in [31] : 
+                retourner=self.liste_piece[nombre].mouvement(coup[1], int(coup[2]))
+                if retourner== 'avance' : 
+                    avancer.append(nombre)
+
+        elif coup[0]== 'r' : 
+            for nombre in [30] : 
+                retourner=self.liste_piece[nombre].mouvement(coup[1], int(coup[2]))
+                if retourner== 'avance' : 
+                    avancer.append(nombre)
+                    
+        return avancer
+
+#Pas touché :
     def __repr__(self) :
       
         print("  a | b | c | d | e | f | g | h |")
-        for i in range(0 ,8):
+        for i in range(7 ,-1,-1):
             print("-"*32)
             
-            print(int(8-i),end="|")
-            for j in range(0 ,8):
+            print(int(i+1),end="|")
+            for j in range(0,8):
                 item = self.feuille[i][j] 
                 print(str(item)+' |', end = " ")
             print()
@@ -63,7 +200,7 @@ class Table :
         return ''
 
 
-        
-
+"""
 test = Table()
 print(test)
+"""
