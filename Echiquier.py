@@ -69,24 +69,28 @@ class Table :
         
         while True :
             Liste_indice = []
-            while Liste_indice == [] :
+            Liste_indice_pion_supp = []
+            while Liste_indice == [] and Liste_indice_pion_supp == [] :
                 print("Veuillez noter votre prochain coup")
                 Coup = Lire()
                 Liste_indice = self.select(Coup)
+                Liste_indice_pion_supp = self.select_poin_attaque(Coup)
+                
             #print(self.liste_piece[Liste_indice[0]].get_coordonnee())
 
             Liste_indice_valide = []
-            for indice in Liste_indice:
-                Colision = self.colision(indice, Coup)
-                if Colision[0] :
-                    if not Colision[1] and not Coup[0] in 'Pp':
-                        Liste_indice_valide.append([indice, Colision[2], Colision[3]])
-                else :
-                    Liste_indice_valide.append([indice])
-
-            Liste_indice = self.select_poin_attaque(Coup)
             if not Liste_indice == [] :
                 for indice in Liste_indice:
+                    Colision = self.colision(indice, Coup)
+                    if Colision[0] :
+                        if not Colision[1] and not Coup[0] in 'Pp':
+                            Liste_indice_valide.append([indice, Colision[2], Colision[3]])
+                    else :
+                        Liste_indice_valide.append([indice])
+
+            
+            if not Liste_indice_pion_supp == [] :
+                for indice in Liste_indice_pion_supp:
                     Colision = self.colision(indice, Coup)
                     if Colision[0] :
                         if not Colision[1] :
