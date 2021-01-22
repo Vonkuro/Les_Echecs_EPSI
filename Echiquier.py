@@ -73,16 +73,25 @@ class Table :
                 print("Veuillez noter votre prochain coup")
                 Coup = Lire()
                 Liste_indice = self.select(Coup)
-            print(self.liste_piece[Liste_indice[0]].get_coordonnee())
+            #print(self.liste_piece[Liste_indice[0]].get_coordonnee())
 
             Liste_indice_valide = []
             for indice in Liste_indice:
                 Colision = self.colision(indice, Coup)
                 if Colision[0] :
-                    if not Colision[1] :
+                    if not Colision[1] and not Coup[0] in 'Pp':
                         Liste_indice_valide.append([indice, Colision[2], Colision[3]])
                 else :
                     Liste_indice_valide.append([indice])
+
+            Liste_indice = self.select_poin_attaque(Coup)
+            if not Liste_indice == [] :
+                for indice in Liste_indice:
+                    Colision = self.colision(indice, Coup)
+                    if Colision[0] :
+                        if not Colision[1] :
+                            Liste_indice_valide.append([indice, Colision[2], Colision[3]])
+
 
             if len(Liste_indice_valide) == 0 :
                 print("Ce coup est impossible, aucune pièce ne peut le réaliser")
@@ -111,6 +120,21 @@ class Table :
                 emplacement_codee = la_piece.get_coordonnee() 
                 emplacement_decodee = [emplacement_codee["nombre"] -1 , self.__lettre_vers_emplacement[emplacement_codee["lettre"]]]
                 self.feuille[emplacement_decodee[0]][emplacement_decodee[1]] = la_piece.get_symbole()
+
+    def select_poin_attaque(self, coup) :
+        avancer=[]
+        if coup[0]== 'P' :
+            for nombre in [1,3,5,7,9,11,13,15] :
+                retourner=self.liste_piece[nombre].mouvement(coup[1], int(coup[2]))
+                if retourner== 'attaque' : 
+                    avancer.append(nombre)
+
+        elif coup[0]== 'p' :
+            for nombre in [0 ,2 ,4,6,8,10,12,14] :
+                retourner=self.liste_piece[nombre].mouvement(coup[1], int(coup[2]))
+                if retourner== 'attaque' : 
+                    avancer.append(nombre)
+        return avancer        
 
     def select(self, coup) : 
 
