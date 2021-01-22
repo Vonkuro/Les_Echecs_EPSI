@@ -41,7 +41,10 @@ class Table :
             n = input()
             if n == '1':
                 break
-            self.deplacement()
+            self.deplacement(True)
+            self.mise_a_jour()
+            print(self)
+            self.deplacement(False)
             self.mise_a_jour()
             print(self)
 
@@ -65,14 +68,14 @@ class Table :
         #aucune colision
         return [False]
       
-    def deplacement(self):
+    def deplacement(self, Joueur_blanc):
         
         while True :
             Liste_indice = []
             Liste_indice_pion_supp = []
             while Liste_indice == [] and Liste_indice_pion_supp == [] :
                 print("Veuillez noter votre prochain coup")
-                Coup = Lire()
+                Coup = Lire(Joueur_blanc)
                 Liste_indice = self.select(Coup)
                 Liste_indice_pion_supp = self.select_poin_attaque(Coup)
                 

@@ -298,11 +298,15 @@ def message_erreur_lire():
     print("Exemple : Df4")
     print("La dame blance doit se rendre à la case de colone f et de ligne 4")
 
-def Lire():
+def Lire(Joueur_blanc):
     while True :
         try:
             lecteur=input()
-            if len(lecteur) != 3 or lecteur[1] not in 'abcdefgh' or lecteur[0] not in 'PpTtFfCcDdRr':
+            if len(lecteur) != 3 or lecteur[1] not in 'abcdefgh':
+                message_erreur_lire()
+            elif Joueur_blanc and lecteur[0] not in 'PTFCDR' :
+                message_erreur_lire()
+            elif not Joueur_blanc and lecteur[0] not in 'ptfcdr' :
                 message_erreur_lire()
             elif int(lecteur[2]) < 1 or int(lecteur[2]) > 8:
                 message_erreur_lire()
