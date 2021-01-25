@@ -96,7 +96,7 @@ class Table :
                 continue
             elif len(Liste_indice_valide) > 1 :
                 print("Ce coup peut être fait avec plusieurs pieces")
-                #Liste_indice_valide = lire choix de la pièce
+                Liste_indice_valide = [self.doute(Liste_indice_valide)]
 
             if len(Liste_indice_valide[0]) > 1 :
                 self.liste_piece[Liste_indice_valide[0][1]].pris()
@@ -104,7 +104,21 @@ class Table :
             else  :
                 self.liste_piece[Liste_indice_valide[0][0]].nouvelle_position(Coup[1],int(Coup[2]))
             break
-            
+
+    def doute(self, liste_indice) :
+        for i in range(len(liste_indice)) :
+            coordonnee = self.liste_piece[liste_indice[i][0]].get_coordonnee()
+            print("Il y a la pièce en ", coordonnee['lettre'],coordonnee['nombre'])
+        print("Laquelle de ces pièces parlez-vous ?(écrire un nombre entre 1 et le nombre de pièces)")
+        while True:
+            try :
+                lecteur = int(input())
+                if lecteur > 0 and lecteur <= len(liste_indice):
+                    break
+            except ValueError:
+                print("Un nombre")
+        return liste_indice[lecteur-1]
+
     def Mat(self, Joueur_blanc):
         liste_indice = []
         if Joueur_blanc :
