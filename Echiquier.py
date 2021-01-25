@@ -1,6 +1,6 @@
 import abc
 from Pieces import *
-#jeu d'echec à rendre pour le 21/01
+
 class Table :
     def __init__(self) :
         self.__lettre_vers_emplacement = {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f' : 5, 'g' : 6, 'h' : 7}
@@ -34,22 +34,13 @@ class Table :
         #on va les placer
         self.mise_a_jour()
 
-    def test_des_deplacement(self):
-        print(self)
-        while True :
-            print("Continuer ?")
-            n = input()
-            if n == '1':
-                break
-            self.deplacement(True)
-            self.mise_a_jour()
-            print(self)
-            self.deplacement(False)
-            self.mise_a_jour()
-            print(self)
+    def Echec(self, Joueur_blanc):
+        if Joueur_blanc:
+            return self.liste_piece[30].vie
+        else :
+            return self.liste_piece[31].vie
 
 
-#Gaëtan a rajouté/modifié :
 
     def colision(self, indice, coup) :
         #renvois : colision ? même camp ? coordonnée si adversaire
@@ -75,7 +66,7 @@ class Table :
             Liste_indice_pion_supp = []
             while Liste_indice == [] and Liste_indice_pion_supp == [] :
                 print("Veuillez noter votre prochain coup")
-                Coup = Lire(Joueur_blanc)
+                Coup = self.Coup_Mat(Joueur_blanc)
                 Liste_indice = self.select(Coup)
                 Liste_indice_pion_supp = self.select_poin_attaque(Coup)
                 
@@ -114,6 +105,49 @@ class Table :
                 self.liste_piece[Liste_indice_valide[0][0]].nouvelle_position(Coup[1],int(Coup[2]))
             break
             
+    def Mat(self, Joueur_blanc):
+        liste_indice = []
+        if Joueur_blanc :
+            pions = [0 ,2 ,4,6,8,10,12,14]
+            autre_pieces = [16,17,20,21,25,24,28,30]
+            Roi = self.liste_piece[31].get_coordonnee()
+        else :
+            pions = [1,3,5,7,9,11,13,15]
+            autre_pieces = [18,19,22,23,26,27,29,31]
+            Roi = self.liste_piece[30].get_coordonnee()
+        Roi_v2 = ['',Roi['lettre'], Roi['nombre']]
+        for indice in pions:
+            if self.liste_piece[indice].vie and self.liste_piece[indice].mouvement(Roi['lettre'], Roi['nombre']) == "attaque":
+                test_collision = self.colision(indice, Roi_v2)
+                if test_collision[0] and not test_collision[1]:
+                    liste_indice.append(indice)
+        for indice in autre_pieces:
+            if self.liste_piece[indice].vie and self.liste_piece[indice].mouvement(Roi['lettre'], Roi['nombre']) == "avance":
+                test_collision = self.colision(indice, Roi_v2)
+                if test_collision[0] and not test_collision[1]:
+                    liste_indice.append(indice)
+        #si la liste n'est pas vide alors le roi est en danger
+        return liste_indice
+
+    def Coup_Mat(self, Joueur_blanc):
+        Danger = self.Mat(Joueur_blanc)
+        if Danger == [] :
+            Coup = Lire(Joueur_blanc)
+        else :
+            coordonnee_danger = []
+            for indice in Danger :
+                coordonnee = self.liste_piece[indice].get_coordonnee()
+                coordonnee_danger.append([coordonnee['lettre'], coordonnee['nombre']])
+            continuation = True
+            while continuation :
+                print("Vous êtes en Mat !")
+                Coup = Lire(Joueur_blanc)
+                if Coup[0] == 'R' or Coup[0] == 'r':
+                    break
+                for autorisee in coordonnee_danger :
+                    if Coup[1] == autorisee[0] and int(Coup[2]) == autorisee[1] :
+                        continuation = False
+        return Coup
 
     def mise_a_jour(self):
         #on réécrit la representation de la table à chaque mise à jour
@@ -240,4 +274,19 @@ class Table :
 """
 test = Table()
 print(test)
+
+    def test_des_deplacement(self):
+        print(self)
+        while True :
+            print("Continuer ?")
+            n = input()
+            if n == '1':
+                break
+            self.deplacement(True)
+            self.mise_a_jour()
+            print(self)
+            self.deplacement(False)
+            self.mise_a_jour()
+            print(self)
+
 """
