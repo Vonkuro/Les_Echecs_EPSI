@@ -1,4 +1,5 @@
 import abc
+import Global
 
 #chemin de la pièce 
     # rend une liste de string contenant les coordonnées de chaque case
@@ -52,8 +53,15 @@ class pion(piece):
     def __init__(self, Lettre_coor, Nombre_coor, Couleur) :
         piece.__init__(self, Lettre_coor, Nombre_coor, Couleur, "Pp")
         self.position_initial = True
+        self.Tour_avance_double = None
+
+    def get_Tour(self):
+        return self.Tour_avance_double
 
     def nouvelle_position(self, Lettre_destination, Nombre_destination):
+        if self.position_initial :
+            if (self.Couleur == 0 and Nombre_destination == (self.coordonnee["nombre"] + 2)) or (self.Couleur == 1 and Nombre_destination == (self.coordonnee['nombre'] - 2)) :
+                self.Tour_avance_double = Global.Tour_Jeu
         self.coordonnee = {"lettre" : Lettre_destination, "nombre" : Nombre_destination}
         self.position_initial = False
 

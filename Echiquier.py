@@ -1,5 +1,6 @@
 import abc
 from Pieces import *
+import Global
 
 class Table :
     def __init__(self) :
@@ -90,7 +91,6 @@ class Table :
                         if not Colision[1] :
                             Liste_indice_valide.append([indice, Colision[2], Colision[3]])
 
-
             if len(Liste_indice_valide) == 0 :
                 print("Ce coup est impossible, aucune pièce ne peut le réaliser")
                 continue
@@ -104,6 +104,63 @@ class Table :
             else  :
                 self.liste_piece[Liste_indice_valide[0][0]].nouvelle_position(Coup[1],int(Coup[2]))
             break
+
+    def trouve(self, lettre, nombre):
+        indice = None
+        for i in range(0 , 32): 
+            element=self.liste_piece[i].get_coordonnee()
+            lettre_decodee = self.__lettre_vers_emplacement[element['lettre']]
+            if lettre==lettre_decodee  and nombre==element['nombre'] : 
+                indice=i
+                break
+        return indice
+
+    def prise_avant(self, Joueur_blanc) :
+        Liste_indice_pion_supp = []
+        while Liste_indice_pion_supp == [] :
+            print("Noter le coup")
+            Coup = self.Coup_Mat(Joueur_blanc)
+            Liste_indice_pion_supp = self.select_poin_attaque(Coup)
+        for indice in Liste_indice_pion_supp:
+            Colision = self.colision(indice, Coup)
+            if not Colision[0] :
+                if Joueur_blanc :
+                    coordonnee = self.liste_piece[indice].get_coordonnee()
+                    if coordonnee['nombre'] == 5 :
+                        lettre_decodee = self.__lettre_vers_emplacement[coordonnee['lettre']]
+                        Pion = []
+                        cible = None
+                        if lettre_decodee != 0  and self.feuille[4][lettre_decodee - 1] == 'p' : 
+                            Pion.append(self.trouve(lettre_decodee - 1, 5))
+                        if lettre_decodee != 7  and self.feuille[4][lettre_decodee + 1] == 'p':
+                            Pion.append(self.trouve(lettre_decodee + 1, 5))
+                        for y in Pion :
+                            if self.liste_piece[y].get_Tour() == Global.Tour_Jeu - 1:
+                                cible = y
+                        if cible != None :
+                            self.liste_piece[cible].pris()
+                            self.liste_piece[indice].nouvelle_position(Coup[1],int(Coup[2]))
+                        else :
+                            return None
+
+                else :
+                    coordonnee = self.liste_piece[indice].get_coordonnee()
+                    if coordonnee['nombre'] == 4 :
+                        lettre_decodee = self.__lettre_vers_emplacement[coordonnee['lettre']]
+                        Pion = []
+                        cible = None
+                        if lettre_decodee != 0  and self.feuille[4][lettre_decodee - 1] == 'P' : 
+                            Pion.append(self.trouve(lettre_decodee - 1, 4))
+                        if lettre_decodee != 7  and self.feuille[4][lettre_decodee + 1] == 'P':
+                            Pion.append(self.trouve(lettre_decodee + 1, 4))
+                        for y in Pion :
+                            if self.liste_piece[y].get_Tour() == Global.Tour_Jeu - 1:
+                                cible = y
+                        if cible != None :
+                            self.liste_piece[cible].pris()
+                            self.liste_piece[indice].nouvelle_position(Coup[1],int(Coup[2]))
+                        else :
+                            return None
 
     def doute(self, liste_indice) :
         for i in range(len(liste_indice)) :
@@ -284,6 +341,79 @@ class Table :
         print("-"*32)
         return ''
 
+    def menu(self , Joueur) : #true = blanc , false = noir 
+        coup = '9'
+        while coup not in '012':
+            print("Vous pouvez tapper: ")
+            print("  - 0 pour demander les coups possibles d'une pièces")
+            print("  - 1 pour jouer un coup")
+            print("  - 2 pour faire une prise en avant")
+            coup=input() 
+            if coup=='0' : #dernière modif
+                get_coordonnee=[]
+                choisir =self.help()
+                get_coordonnee.append(choisir[0])
+                get_coordonnee.append(int(choisir[1]))
+                for i in range(0 , 32): 
+
+                    element=self.liste_piece[i].get_coordonnee()
+
+                    if get_coordonnee[0]==element['lettre']  and get_coordonnee[1]==element['nombre'] : 
+
+                        indice=i 
+
+                        break
+                indice=i
+                #choisir les cases qu'il faut tester
+                
+                coup_disponible=[]
+                cases=['a1' , 'a2' , 'a3' , 'a4' , 'a5' , 'a6' , 'a7' , 'a8' ,
+                'b1' , 'b2' ,'b3' , 'b4' ,'b5' , 'b6' ,'b7' , 'b8' ,
+                'c1' , 'c2' , 'c3' , 'c4', 'c5' , 'c6', 'c7' , 'c8',
+                'd1', 'd2', 'd3' , 'd4 ' ,'d5' , 'd6' , 'd7' , 'd8',
+                'e1' , 'e2' , 'e3' , 'e4' , 'e5' , 'e6' , 'e7' , 'e8' ,
+                'f1' , 'f2' , 'f3' , 'f4' , 'f5' , 'f6' , 'f7' , 'f8' ,
+                'g1' , 'g2' , 'g3' , 'g4' , 'g5' , 'g6' , 'g7' , 'g8' ,
+                'h1' , 'h2' , 'h3' , 'h4' , 'h5' , 'h6' , 'h7' , 'h8' 
+                ]      
+                for case in cases :
+
+                    retour=self.liste_piece[indice].mouvement(case[0] , int(case[1]))
+                    if retour== 'avance' or retour == 'attaque' : 
+                    
+                        coup_disponible.append(case)
+                    
+
+                
+                if len(coup_disponible)>0 : 
+                    print('La liste des coups disponible pour la pièce que tu as séléctionner :')
+                    for case in coup_disponible:
+                        print(case,end=' ')
+                    print('')
+                    self.deplacement(Joueur)
+                
+                else: 
+                    print('Pas de coups disponible pour cette pièce !')
+                #fin modif
+            elif coup =='1' :
+                self.deplacement(Joueur)
+            elif coup == '2':
+                self.prise_avant(Joueur)
+        
+
+
+    def help(self):
+        while True :
+
+            choisir=input('Selectionner la pièce que vous voulez déplacer : \n')
+
+            if len(choisir)==2 : 
+                if choisir[0] in 'abcdefgh' : 
+                    if choisir[1] in '12345678' : 
+                        return choisir 
+            
+            else :     
+                print('Faites attention à votre écriture!') 
 
 """
 test = Table()
